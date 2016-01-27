@@ -1,0 +1,46 @@
+OSSEC v2015-12
+
+
+= Recommended Installation =
+
+Installing OSSEC is very easy. We spent a lot of time automating the
+installation process as much as possible and choosing sane defaults that 
+are useful for the majority of cases.
+
+It works well on most Linux distributions and *BSD systems.
+
+To get started:
+
+
+1- Download OSSEC: 
+   # wget https://bitbucket.org/dcid/ossec-hids/get/tip.tar.gz
+
+2- Install gcc and make. It comes by default on all BSD's and can be
+   easily installed by running "apt-get install gcc make" on Debian/Ubuntu
+   or "yum install gcc make" on CentOS/RedHat.
+
+3- Run the script ./install.sh. It will guide you through the 
+   installation process.
+   # cd *ossec*
+   # ./install.sh
+
+4- The install script will create everything necessary and get you
+   up and running in a few minutes. Once completed, just run:
+
+   # /var/ossec/bin/ossec-control start
+
+   To start OSSEC.
+
+5- If you are running it on multiple servers, make sure to install
+   the manager first and the agent install on the others. Use the manage_agents 
+   tool to create the right encryption keys.
+
+6- Enjoy.
+
+
+This text gives you some direction as well if needed:
+
+http://dcid.me/texts/my-ossec-setup-manual.html
+
+
+#EOF

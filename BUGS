@@ -1,0 +1,18 @@
+** Reporting bugs **
+
+Bugs should be sent to the bitbucket issue tracker:
+
+https://bitbucket.org/dcid/ossec-hids/issues
+
+Please include the following information:
+
+-OSSEC version number.
+-Content of /etc/ossec-init.conf
+-Content of /var/ossec/etc/ossec.conf
+-Content of /var/ossec/logs/ossec.log
+-Operating system name/version (uname -a if Unix)
+
+Along with any other relevant information.
+
+If you prefer to contact us privately or if it is a security
+issue, send an e-mail to Daniel Cid ( dcid@sucuri.net ).

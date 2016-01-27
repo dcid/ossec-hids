@@ -1,0 +1,41 @@
+OSSEC dcid-fork changelog. This are the changes I have been pushing live 
+to my personal OSSEC fork. It is also integrating some changes we have done
+for Sucuri's internal use.
+
+Every few months we create a stable release with these changes mostly for
+internal use, but it is open for anyone to get as well.
+
+
+Changes with 2016-01
+   * Feature: Added different_geoip and different_srcip rule types.
+   * Feature: Started to properly track the different_* usage so all
+     logs have to be different.
+   * Feature: Added sshd rules using different_geoip to track some
+     types of behaviour anomalies.
+   * Feature: Added rules to flag on shellshock activity.
+   * Feature: Added frequency option to logcollector commands. 
+     You can now specify hourly, or daily or any number of seconds.
+   * Feature: Added libgeoip from MaxMind by default and changed 
+     installation script to auto download the latest DB from them.
+   * Bug fixed: Multiple signatures cleanup and more sane defaults chosen.
+
+Changes with 2015-12
+   * Feature: Added integratord
+   * Feature: Added slack and pagerduty support to integratord
+   * Feature: New signature for the Joomla RCE
+   * Bug fix: WordPress decoder to work with the latest plugin.
+
+Changes with 2015-11
+  * Feature: Added GeoIP support by default
+  * Bug fix: Cleaned up noisy rules
+  * Bug fix: Segfault on reported when srcip filter was being used.
+
+Changes with 2015-04
+   * Feature: Added syslog-sources to agent control
+   * Bug fix: Cleaned up storage format from ossec decoder.
+   * Bug fix: Broken memory management on the ossec decoder.
+   * Bug fix: Removing noisy/useless web-based rules.
+
+Changes with 2013-07
+   * Feature: Added hybrid mode to allow a install to be running in 
+     local + agent mode.
