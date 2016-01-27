@@ -118,12 +118,6 @@ int Read_Localfile(XML_NODE node, void *d1, void *d2)
         }
         else if(strcmp(node[i]->element,xml_localfile_frequency) == 0)
         {
-            if(!OS_StrIsNum(node[i]->content))
-            {
-                merror(XML_VALUEERR,ARGV0,node[i]->element,node[i]->content);
-                return(OS_INVALID);
-            }
-
             if(strcmp(node[i]->content,  "hourly") == 0)
             {
                 logf[pl].ign = 3600;
@@ -134,6 +128,12 @@ int Read_Localfile(XML_NODE node, void *d1, void *d2)
             }
             else
             {
+                if(!OS_StrIsNum(node[i]->content))
+                {
+                    merror(XML_VALUEERR,ARGV0,node[i]->element,node[i]->content);
+                    return(OS_INVALID);
+                }
+
                 logf[pl].ign = atoi(node[i]->content);
             }
         }
