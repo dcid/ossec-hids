@@ -6,7 +6,7 @@ Every few months we create a stable release with these changes mostly for
 internal use, but it is open for anyone to get as well.
 
 
-Changes with 2016-01
+Changes with 2016-02
    * Feature: Added different_geoip and different_srcip rule types.
    * Feature: Started to properly track the different_* usage so all
      logs have to be different.
@@ -18,6 +18,7 @@ Changes with 2016-01
    * Feature: Added libgeoip from MaxMind by default and changed 
      installation script to auto download the latest DB from them.
    * Bug fixed: Multiple signatures cleanup and more sane defaults chosen.
+   * Deprecated: if_matched_regex as it was barely used and very slow.
 
 Changes with 2015-12
    * Feature: Added integratord
@@ -29,6 +30,7 @@ Changes with 2015-11
   * Feature: Added GeoIP support by default
   * Bug fix: Cleaned up noisy rules
   * Bug fix: Segfault on reported when srcip filter was being used.
+  * Deprecated: Host deny active response.
 
 Changes with 2015-04
    * Feature: Added syslog-sources to agent control

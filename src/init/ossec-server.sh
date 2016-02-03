@@ -22,7 +22,7 @@ fi
 
 
 NAME="OSSEC HIDS"
-VERSION="rel2015-12"
+VERSION="rel2016-02"
 AUTHOR="Trend Micro Inc."
 DAEMONS="ossec-monitord ossec-logcollector ossec-remoted ossec-syscheckd ossec-analysisd ossec-maild ossec-execd ${DB_DAEMON} ${CSYSLOG_DAEMON} ${AGENTLESS_DAEMON} ${INTEGRATOR_DAEMON}"
 

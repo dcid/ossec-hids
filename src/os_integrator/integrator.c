@@ -173,6 +173,14 @@ void OS_IntegratorD(IntegratorConfig **integrator_config)
                 }
             }
 
+            /* Looking for the rule */
+            if(integrator_config[s]->rule_id)
+            {
+                if(al_data->rule != *(integrator_config[s]->rule_id))
+                {
+                    s++; continue;
+                }
+            }
 
             /* Create temp file once per alert. */
             if(temp_file_created == 0)
