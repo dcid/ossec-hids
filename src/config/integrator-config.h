@@ -23,7 +23,7 @@ typedef struct _IntegratorConfig
 {
     unsigned int level;
     unsigned int enabled;
-    unsigned int *rule_id;
+    unsigned int *rule_id; /* array, ending with a 0 */
 
     char *name;
     char *apikey;

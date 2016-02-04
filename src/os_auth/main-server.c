@@ -1,4 +1,4 @@
-/* @(#) $Id: ./src/os_auth/main-server.c, 2011/09/08 dcid Exp $
+/* @(#) $Id: ./src/os_auth/main-server.c, 2016/01/12 dcid Exp $
  */
 
 /* Copyright (C) 2010 Trend Micro Inc.
@@ -12,13 +12,9 @@
 
 
 #include "shared.h"
+#include "os_crypto/md5/md5_op.h"
 #include "auth.h"
 
-
-/* ossec-reportd - Runs manual reports. */
-void report_help()
-{
-}
 
 #ifndef USE_OPENSSL
 int main()
@@ -29,15 +25,59 @@ int main()
 #else
 
 
+/** help **/
+void helpmsg()
+{
+    printf("\nOSSEC HIDS %s: Authd.\n", ARGV0);
+    printf("Available options:\n");
+    printf("\t-h          This help message.\n");
+    printf("\t-p <port>   Bind to port.\n");
+    printf("\t-n          Disable shared password authentication (not recommended).\n");
+    exit(1);
+}
+
+
+
+/* Generates a random and temporary shared pass to be used by the agents. */
+char *__generatetmppass()
+{
+    int rand1;
+    int rand2;
+    os_md5 md1;
+    char *fstring = NULL;
+    char str1[STR_SIZE +1];
+    char *muname = NULL;
+
+    #ifndef WIN32
+        #ifdef __OpenBSD__
+        srandomdev();
+        #else
+        srandom(time(0) + getpid() + getppid());
+        #endif
+    #else
+        srandom(time(0) + getpid());
+    #endif
+
+    rand1 = random();
+    rand2 = random();
+    muname = getuname();
+
+    snprintf(str1, STR_SIZE, "%d%d%s%d",(int)time(0), rand1, muname, rand2);
+    OS_MD5_Str(str1, md1);
+    fstring = strdup(md1);
+    return(fstring);
+}
+
+
 int main(int argc, char **argv)
 {
     FILE *fp;
+    char *authpass = NULL;
     int c, test_config = 0;
     int gid = 0, client_sock = 0, sock = 0, port = 1515, ret = 0;
     char *dir  = DEFAULTDIR;
     char *user = USER;
     char *group = GROUPGLOBAL;
-    char *cfg = DEFAULTCPATH;
     char buf[4096 +1];
     SSL_CTX *ctx;
     SSL *ssl;
@@ -52,15 +92,20 @@ int main(int argc, char **argv)
 
     /* Setting the name */
     OS_SetName(ARGV0);
+
+
+    /* Getting temporary pass. */
+    authpass = __generatetmppass();
+
         
-    while((c = getopt(argc, argv, "Vdhu:g:D:c:m:p:")) != -1)
+    while((c = getopt(argc, argv, "Vdhu:g:D:m:p:n")) != -1)
     {
         switch(c){
             case 'V':
                 print_version();
                 break;
             case 'h':
-                report_help();
+                helpmsg();
                 break;
             case 'd':
                 nowDebug();
@@ -79,14 +124,11 @@ int main(int argc, char **argv)
                 if(!optarg)
                     ErrorExit("%s: -D needs an argument",ARGV0);
                 dir = optarg;
-            case 'c':
-                if(!optarg)
-                    ErrorExit("%s: -c needs an argument",ARGV0);
-                cfg = optarg;
-                break;
             case 't':
                 test_config = 1;    
                 break;
+            case 'n':
+                authpass = NULL;
             case 'p':
                if(!optarg)
                     ErrorExit("%s: -%c needs an argument",ARGV0, c);
@@ -97,14 +139,16 @@ int main(int argc, char **argv)
                 }
                 break;
             default:
-                report_help();
+                helpmsg();
                 break;
         }
 
     }
 
+
     /* Starting daemon */
     debug1(STARTED_MSG,ARGV0);
+
 
     /* Check if the user/group given are valid */
     gid = Privsep_GetGroup(group);
@@ -142,13 +186,42 @@ int main(int argc, char **argv)
     verbose(STARTUP_MSG, ARGV0, (int)getpid());
 
 
+    /* Checking if there is a custom password file */
+    fp = fopen(AUTHDPASS_PATH, "r");
+    buf[0] = '\0';
+    if(fp)
+    {
+        buf[4096] = '\0';
+        fgets(buf, 4095, fp);
+        if(strlen(buf) > 2)
+        {
+            authpass = buf;
+        }
+        fclose(fp);
+    }
+
+    if(buf[0] != '\0')
+    {
+        verbose("Accepting connections. Using password specified on file: %s",AUTHDPASS_PATH);
+    }
+    else if(authpass)
+    {
+        verbose("Accepting connections. Random password chosen for agent authentication: %s", authpass);
+    }
+    else
+    {
+        verbose("Accepting insecure connections. No password required (not recommended)");
+    }
+
+
+    /* Getting SSL cert. */
     fp = fopen(KEYSFILE_PATH,"a");
     if(!fp)
     {
         merror("%s: ERROR: Unable to open %s (key file)", ARGV0, KEYSFILE_PATH);
         exit(1);
     }
-    
+
 
     /* Starting SSL */	
     ctx = os_ssl_keys(0, dir);
@@ -192,14 +265,45 @@ int main(int argc, char **argv)
 
             verbose("%s: INFO: New connection from %s", ARGV0, srcip);
 
+            buf[0] = '\0';
             ret = SSL_read(ssl, buf, sizeof(buf));
             sleep(1);
             if(ret > 0)
             {
                 int parseok = 0;
-                if(strncmp(buf, "OSSEC A:'", 9) == 0)
+                char *tmpstr = buf;
+
+                /* Checking for shared password authentication. */
+                if(authpass)
                 {
-                    char *tmpstr = buf;
+                    /* Format is pretty simple: OSSEC PASS: PASS WHATEVERACTION */
+                    if(strncmp(tmpstr, "OSSEC PASS:", 12) == 0)
+                    {
+                        tmpstr = tmpstr + 12;
+                        if(strlen(tmpstr) > strlen(authpass) && strncmp(tmpstr, authpass, strlen(authpass)) == 0)
+                        {
+                            tmpstr = tmpstr + strlen(authpass);
+                            if(*tmpstr == ' ')
+                            {
+                                tmpstr++;
+                                parseok = 1;
+                            }
+                        }
+                    }
+                    if(parseok == 0)
+                    {
+                        merror("%s: ERROR: Invalid password provided by %s. Closing connection.", ARGV0, srcip);
+                        SSL_CTX_free(ctx);
+                        close(client_sock);
+                        exit(0);
+                    }
+                }
+
+
+                /* Checking for action A (add agent) */
+                parseok = 0;
+                if(strncmp(tmpstr, "OSSEC A:'", 9) == 0)
+                {
                     agentname = tmpstr + 9;
                     tmpstr += 9;
                     while(*tmpstr != '\0')
@@ -214,6 +318,7 @@ int main(int argc, char **argv)
                         tmpstr++;
                     }
                 }
+
                 if(parseok == 0)
                 {
                     merror("%s: ERROR: Invalid request for new agent from: %s", ARGV0, srcip);

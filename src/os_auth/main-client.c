@@ -44,33 +44,33 @@ void report_help()
 
 int main(int argc, char **argv)
 {
+    int key_added = 0;
     int c, test_config = 0;
     #ifndef WIN32
     int gid = 0;
     #endif
 
     int sock = 0, port = 1515, ret = 0;
-    char *dir  = DEFAULTDIR;
     char *user = USER;
     char *group = GROUPGLOBAL;
-    char *cfg = DEFAULTCPATH;
+    char *authpass = NULL;
     char *manager = NULL;
     char *agentname = NULL;
     char lhostname[512 + 1];
-    char buf[2048 +1];
+    char buf[4096 +1];
     SSL_CTX *ctx;
     SSL *ssl;
     BIO *sbio;
 
 
     bio_err = 0;
-    buf[2048] = '\0';
+    buf[4096] = '\0';
 
 
     /* Setting the name */
     OS_SetName(ARGV0);
         
-    while((c = getopt(argc, argv, "Vdhu:g:D:c:m:p:A:")) != -1)
+    while((c = getopt(argc, argv, "Vdhu:g:m:p:A:P:")) != -1)
     {
         switch(c){
             case 'V':
@@ -92,14 +92,8 @@ int main(int argc, char **argv)
                     ErrorExit("%s: -g needs an argument",ARGV0);
                 group=optarg;
                 break;
-            case 'D':
-                if(!optarg)
-                    ErrorExit("%s: -D needs an argument",ARGV0);
-                dir=optarg;
-            case 'c':
-                if(!optarg)
-                    ErrorExit("%s: -c needs an argument",ARGV0);
-                cfg = optarg;
+            case 'P':
+                authpass = optarg;
                 break;
             case 't':
                 test_config = 1;    
@@ -128,6 +122,7 @@ int main(int argc, char **argv)
                 break;
         }
     }
+
 
     /* Starting daemon */
     debug1(STARTED_MSG,ARGV0);
@@ -188,6 +183,31 @@ int main(int argc, char **argv)
         merror("%s: ERROR: Manager IP not set.", ARGV0);
         exit(1);
     }
+
+
+    /* Checking if there is a custom password file */
+    if(authpass == NULL)
+    {
+        FILE *fp;
+        fp = fopen(AUTHDPASS_PATH, "r");
+        buf[0] = '\0';
+        if(fp)
+        {
+            buf[4096] = '\0';
+            fgets(buf, 4095, fp);
+            if(strlen(buf) > 2)
+            {
+                authpass = buf;
+            }
+            fclose(fp);
+            printf("INFO: Using password specified on file: %s\n", AUTHDPASS_PATH);
+        }
+    }
+    if(!authpass)
+    {
+        printf("WARN: No authentication password provided. Insecure mode started.\n");
+    }
+
   
 
     /* Connecting via TCP */
@@ -216,9 +236,17 @@ int main(int argc, char **argv)
     
     printf("INFO: Connected to %s:%d\n", manager, port);
     printf("INFO: Using agent name as: %s\n", agentname);
+    printf("\n");
 
 
-    snprintf(buf, 2048, "OSSEC A:'%s'\n", agentname);
+    if(authpass)
+    {
+        snprintf(buf, 2048, "OSSEC PASS: %s OSSEC A:'%s'\n", authpass, agentname);
+    }
+    else
+    {
+        snprintf(buf, 2048, "OSSEC A:'%s'\n", agentname);
+    }
     ret = SSL_write(ssl, buf, strlen(buf));
     if(ret < 0)
     {
@@ -278,11 +306,16 @@ int main(int argc, char **argv)
                         fprintf(fp, "%s\n", key);
                         fclose(fp);
                     }
+                    key_added = 1;
                     printf("INFO: Valid key created. Finished.\n");
                 }
                 break;
             case SSL_ERROR_ZERO_RETURN:
             case SSL_ERROR_SYSCALL:
+                if(key_added == 0)
+                {
+                    printf("ERROR: Unable to create key. Either wrong password or connection not accepted by the manager.\n");
+                }
                 printf("INFO: Connection closed.\n");
                 exit(0);
                 break;
@@ -297,6 +330,10 @@ int main(int argc, char **argv)
 
 
     /* Shutdown the socket */
+    if(key_added == 0)
+    {
+        printf("ERROR: Unable to create key. Either wrong password or connection not accepted by the manager.\n");
+    }
     SSL_CTX_free(ctx);
     close(sock);
 

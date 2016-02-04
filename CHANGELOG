@@ -6,6 +6,9 @@ Every few months we create a stable release with these changes mostly for
 internal use, but it is open for anyone to get as well.
 
 
+Changes at the dev version
+   * Feature: Added a default temp (shared) password for os_authd
+
 Changes with 2016-02
    * Feature: Added different_geoip and different_srcip rule types.
    * Feature: Started to properly track the different_* usage so all

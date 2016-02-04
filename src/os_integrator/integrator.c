@@ -176,7 +176,23 @@ void OS_IntegratorD(IntegratorConfig **integrator_config)
             /* Looking for the rule */
             if(integrator_config[s]->rule_id)
             {
-                if(al_data->rule != *(integrator_config[s]->rule_id))
+                /* match any rule in array */
+                int id_i = 0;
+                int rule_match = -1;
+
+                while(integrator_config[s]->rule_id[id_i])
+                {
+                    if(al_data->rule == integrator_config[s]->rule_id[id_i])
+                    {
+                        rule_match = id_i;
+                        break;
+                    }
+
+                    id_i++;
+                }
+
+                /* skip integration if none are matched */
+                if(rule_match == -1)
                 {
                     s++; continue;
                 }
