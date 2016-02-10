@@ -255,17 +255,55 @@ int check_diff_file(char *host, char *script)
              "2>/dev/null",
              tmp_location, old_location, 
              DIFF_DIR_PATH, host, script, date_of_change);
-    if(system(diff_cmd) != 256)
+
+    int rc = system(diff_cmd);
+
+    /* If diff terminated normally */
+    if(WIFEXITED(rc))
     {
-        merror("%s: ERROR: Unable to run diff for %s->%s",
-               ARGV0,  host, script);
-        return(0); 
+        /* If exit status is larger than 1, there was a problem */
+        if(WEXITSTATUS(rc) > 1)
+        {
+            /* If diffing binary files, use diff -q to get a 0 or 1 return code */
+            snprintf(diff_cmd, 2048, "diff -q \"%s\" \"%s\" > \"%s/%s->%s/diff.%d\" "
+                     "2>/dev/null",
+                     tmp_location, old_location,
+                     DIFF_DIR_PATH, host, script, date_of_change);
+            int rc2 = system(diff_cmd);
+
+            if(WIFEXITED(rc2))
+            {
+                /* If diff -q returns a code > 1, then there is still a problem */
+                if(WEXITSTATUS(rc2) > 1)
+                {
+                    merror("%s: ERROR: both diff and diff -q for %s and %s had trouble: diff rc %d, diff -q rc %d",
+                            ARGV0, tmp_location, old_location, rc, rc2);
+                }
+                /* If diff -q returned 0 or 1, then it ran ok */
+                else
+                {
+                    /* Generate alert. */
+                    gen_diff_alert(host, script, date_of_change);
+                }
+            }
+            else
+            {
+                merror("%s: ERROR: diff -q for %s and %s terminated abnormally",
+                        ARGV0, tmp_location, old_location);
+            }
+        }
+        /* If exit status is 0 or 1, then diff ran ok */
+        else
+        {
+            /* Generate alert. */
+            gen_diff_alert(host, script, date_of_change);
+        }
     }
-
-
-    /* Generate alert. */
-    gen_diff_alert(host, script, date_of_change);
-
+    else
+    {
+        merror("%s: ERROR: diff for %s and %s terminated abnormally",
+                ARGV0, tmp_location, old_location);
+    }
 
     return(0);
 }
