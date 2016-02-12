@@ -52,7 +52,9 @@ char *gen_diff_alert(char *filename, int alert_diff_time)
         buf[n] = '\0';
         tmp_str = strrchr(buf, '\n');
         if(tmp_str)
+        {
             *tmp_str = '\0';
+        }
         else
         {
             /* Weird diff with only one large line. */
@@ -246,24 +248,64 @@ char *seechanges_addfile(char *filename)
     }
 
 
-    /* Run diff. */
+    /* Run diff and generate an alert */
     date_of_change = File_DateofChange(old_location);
     snprintf(diff_cmd, 2048, "diff \"%s\" \"%s\" > \"%s/local/%s/diff.%d\" " 
              "2>/dev/null",
              tmp_location, old_location, 
              DIFF_DIR_PATH, filename +1, date_of_change);
-    if(system(diff_cmd) != 256)
+
+    int rc = system(diff_cmd);
+
+    /* If diff terminated normally */
+    if(WIFEXITED(rc))
     {
-        merror("%s: ERROR: Unable to run diff for %s",
-               ARGV0,  filename);
+        /* If exit status is larger than 1, there was a problem */
+        if(WEXITSTATUS(rc) > 1)
+        {
+            /* If diffing binary files, use diff -q to get a 0 or 1 return code */
+            snprintf(diff_cmd, 2048, "diff -q \"%s\" \"%s\" > \"%s/local/%s/diff.%d\" "
+                     "2>/dev/null",
+                     tmp_location, old_location,
+                     DIFF_DIR_PATH, filename + 1, date_of_change);
+            int rc2 = system(diff_cmd);
+
+            if(WIFEXITED(rc2))
+            {
+                /* If diff -q returns a code > 1, then there is still a problem */
+                if(WEXITSTATUS(rc2) > 1)
+                {
+                    merror("%s: ERROR: both diff and diff -q for %s and %s had trouble: diff rc %d, diff -q rc %d",
+                            ARGV0, tmp_location, old_location, rc, rc2);
+                    return(NULL);
+                }
+                /* If diff -q returned 0 or 1, then it ran ok */
+                else
+                {
+                    return(gen_diff_alert(filename, date_of_change));
+                }
+            }
+            else
+            {
+                merror("%s: ERROR: diff -q for %s and %s terminated abnormally",
+                        ARGV0, tmp_location, old_location);
+                return(NULL);
+            }
+        }
+        /* If exit status is 0 or 1, then diff ran ok */
+        else
+        {
+            return(gen_diff_alert(filename, date_of_change));
+        }
+    }
+    else
+    {
+        merror("%s: ERROR: diff for %s and %s terminated abnormally",
+                ARGV0, tmp_location, old_location);
         return(NULL); 
     }
 
-
-    /* Generate alert. */
-    return(gen_diff_alert(filename, date_of_change));
-
-
+    /* Should never get here */
     return(NULL);
 }
 
