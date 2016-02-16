@@ -946,8 +946,8 @@ main()
         . ${PREDEF_FILE}
     fi
 
-    # If user language is not set
 
+    # If user language is not set
     if [ "X${USER_LANGUAGE}" = "X" ]; then
 
         # Choosing the language.
@@ -1222,12 +1222,20 @@ main()
         fi
     fi
 
+
     # Installing (calls the respective script
     # -- InstallAgent.sh or InstallServer.sh
     Install
     ls -la GeoLiteCity.dat > /dev/null 2>&1
     if [ $? = 0 ]; then
         mv GeoLiteCity.dat $INSTALLDIR/etc/
+    fi
+
+
+    # Generate random seed for this node
+    ls -la /dev/urandom >/dev/null 2>&1
+    if [ $? = 0 ]; then
+        head -c 4096 /dev/urandom > $INSTALLDIR/etc/random.seed
     fi
 
 

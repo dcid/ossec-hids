@@ -193,6 +193,7 @@ char *seechanges_addfile(char *filename)
     char old_location[OS_MAXSTR +1];
     char tmp_location[OS_MAXSTR +1];
     char diff_cmd[OS_MAXSTR +1];
+    char *tmpstr;
 
     os_md5 md5sum_old;
     os_md5 md5sum_new;
@@ -202,6 +203,18 @@ char *seechanges_addfile(char *filename)
     diff_cmd[OS_MAXSTR] = '\0';
     md5sum_new[0] = '\0';
     md5sum_old[0] = '\0';
+
+
+    /* We don't do diff of files with non safe characters. */
+    tmpstr = filename;
+    while(*tmpstr != '\0')
+    {
+        if(*tmpstr < 44 || *tmpstr > 122 || *tmpstr == '`' || *tmpstr == '\'')
+        {
+            return(NULL);
+        }
+        tmpstr++;
+    }
 
 
     snprintf(old_location, OS_MAXSTR, "%s/local/%s/%s", DIFF_DIR_PATH, filename +1,
@@ -250,7 +263,7 @@ char *seechanges_addfile(char *filename)
 
     /* Run diff and generate an alert */
     date_of_change = File_DateofChange(old_location);
-    snprintf(diff_cmd, 2048, "diff \"%s\" \"%s\" > \"%s/local/%s/diff.%d\" " 
+    snprintf(diff_cmd, 2048, "diff '%s' '%s' > '%s/local/%s/diff.%d' " 
              "2>/dev/null",
              tmp_location, old_location, 
              DIFF_DIR_PATH, filename +1, date_of_change);
@@ -264,7 +277,7 @@ char *seechanges_addfile(char *filename)
         if(WEXITSTATUS(rc) > 1)
         {
             /* If diffing binary files, use diff -q to get a 0 or 1 return code */
-            snprintf(diff_cmd, 2048, "diff -q \"%s\" \"%s\" > \"%s/local/%s/diff.%d\" "
+            snprintf(diff_cmd, 2048, "diff -q '%s' '%s' > '%s/local/%s/diff.%d' "
                      "2>/dev/null",
                      tmp_location, old_location,
                      DIFF_DIR_PATH, filename + 1, date_of_change);

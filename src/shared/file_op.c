@@ -273,6 +273,25 @@ int CreatePID(char *name, int pid)
     return(0);
 }
 
+
+char *GetRandomNoise()
+{
+    FILE *fp;
+    char buf[2048 + 1];
+
+    /* Reading urandom */
+    fp = fopen("/dev/urandom", "r");
+    if(!fp)
+    {
+        return(NULL);
+    }
+
+    buf[2048] = '\0';
+    fread(buf, 1, 2048, fp);
+    return(strdup(buf));
+}
+
+
 int DeletePID(char *name)
 {
     char file[256];

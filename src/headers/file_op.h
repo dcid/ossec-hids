@@ -32,6 +32,8 @@ int IsDir(char *file);
 
 int CreatePID(char *name, int pid);
 
+char *GetRandomNoise();
+
 int DeletePID(char *name);
 
 int MergeFiles(char *finalpath, char **files);
