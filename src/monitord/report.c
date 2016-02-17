@@ -25,6 +25,7 @@ void report_help()
     printf("\t-r <filter> <value> Show related entries.\n");
     printf("\t-n                  Creates a description for the report.\n");
     printf("\t-s                  Show the alert dump.\n");
+    printf("\t-p                  Disable privilege dropping.\n");
     printf("\n");
     printf("\tFilters allowed: group, rule, level, location,\n");
     printf("\t                 user, srcip, filename\n");
@@ -40,6 +41,7 @@ void report_help()
 
 int main(int argc, char **argv)
 {
+    int privdrop = 1;
     int c, test_config = 0;
     int uid=0,gid=0;
     char *dir  = DEFAULTDIR;
@@ -76,9 +78,12 @@ int main(int argc, char **argv)
     
     r_filter.report_name = NULL;
 
-    while((c = getopt(argc, argv, "Vdhstu:g:D:f:v:n:r:")) != -1)
+    while((c = getopt(argc, argv, "Vdhstpu:g:D:f:v:n:r:")) != -1)
     {
         switch(c){
+            case 'p':
+                privdrop = 0;
+                break;
             case 'V':
                 print_version();
                 break;
@@ -149,23 +154,32 @@ int main(int argc, char **argv)
     /* Starting daemon */
     debug1(STARTED_MSG,ARGV0);
 
-    /* Check if the user/group given are valid */
-    uid = Privsep_GetUser(user);
-    gid = Privsep_GetGroup(group);
-    if((uid < 0)||(gid < 0))
-        ErrorExit(USER_ERROR,ARGV0,user,group);
+
+    if(privdrop == 1)
+    {
+        /* Check if the user/group given are valid */
+        uid = Privsep_GetUser(user);
+        gid = Privsep_GetGroup(group);
+        if((uid < 0)||(gid < 0))
+            ErrorExit(USER_ERROR,ARGV0,user,group);
 
     
 
-    /* Exit here if test config is set */
-    if(test_config)
-        exit(0);
+        /* Exit here if test config is set */
+        if(test_config)
+            exit(0);
 
         
-    /* Privilege separation */	
-    if(Privsep_SetGroup(gid) < 0)
-        ErrorExit(SETGID_ERROR,ARGV0,group);
-
+        /* Privilege separation */	
+        if(Privsep_SetGroup(gid) < 0)
+            ErrorExit(SETGID_ERROR,ARGV0,group);
+    }
+    else
+    {
+        /* Exit here if test config is set */
+        if(test_config)
+            exit(0);
+    }
     
     /* chrooting */
     if(Privsep_Chroot(dir) < 0)
@@ -176,8 +190,11 @@ int main(int argc, char **argv)
 
     
     /* Changing user */        
-    if(Privsep_SetUser(uid) < 0)
-        ErrorExit(SETUID_ERROR,ARGV0,user);
+    if(privdrop == 1)
+    {
+        if(Privsep_SetUser(uid) < 0)
+            ErrorExit(SETUID_ERROR,ARGV0,user);
+    }
 
 
     debug1(PRIVSEP_MSG,ARGV0,dir,user);
@@ -190,8 +207,11 @@ int main(int argc, char **argv)
     
 
     /* Creating PID files */
-    if(CreatePID(ARGV0, getpid()) < 0)
-        ErrorExit(PID_ERROR,ARGV0);
+    if(privdrop == 1)
+    {
+        if(CreatePID(ARGV0, getpid()) < 0)
+            ErrorExit(PID_ERROR,ARGV0);
+    }
 
     
     /* Start up message */

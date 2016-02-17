@@ -39,7 +39,10 @@ int FTS_Init()
     char _line[OS_FLSIZE + 1];
 
     _line[OS_FLSIZE] = '\0';
-            
+ 
+    #ifdef TESTRULE
+    return(1);
+    #endif           
     
     fts_list = OSList_Create();
     if(!fts_list)
@@ -239,6 +242,10 @@ int FTS(Eventinfo *lf)
 
     OSListNode *fts_node;
 
+    #ifdef TESTRULE
+    return(0);
+    #endif
+
     _line[OS_FLSIZE] = '\0';
 
 
@@ -303,11 +310,6 @@ int FTS(Eventinfo *lf)
         return(0);
     }
 
-    
-    #ifdef TESTRULE
-    return(1);
-    #endif
-    
     
     /* Saving to fts fp */	
     fseek(fp_list, 0, SEEK_END);

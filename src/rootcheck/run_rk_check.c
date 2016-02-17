@@ -122,13 +122,12 @@ void run_rk_check()
     if(rootcheck.notify != QUEUE)
     {
         printf("\n");
-        printf("** Starting Rootcheck v0.9 by Daniel B. Cid        **\n");
-        printf("** http://www.ossec.net/en/about.html#dev-team     **\n");
-        printf("** http://www.ossec.net/rootcheck/                 **\n\n");
+        printf("** Starting Rootcheck %s               **\n", __version);
+        printf("** http://dcid.me/rootcheck/                 **\n\n");
         printf("Be patient, it may take a few minutes to complete...\n");
         printf("\n");
     }
-    
+
  
     /* Cleaning the global variables */
     rk_sys_count = 0;
@@ -363,8 +362,7 @@ void run_rk_check()
     
     if(rootcheck.notify != QUEUE)
     {
-        printf("\n");
-        printf("- Scan completed in %d seconds.\n\n", (int)(time2 - time1));
+        debug1("%s: DEBUG: Scan completed in %d seconds.", ARGV0, (int)(time2 - time1));
     }
     else
     {

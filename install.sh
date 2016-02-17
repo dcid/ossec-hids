@@ -741,7 +741,7 @@ ConfigureServer()
                 echo ""
                 if [ $? = 0 ]; then
                     echo "  <global>" >> $NEWCONFIG
-                    echo "  <geoipdb>/var/ossec/etc/GeoLiteCity.dat</geoipdb>"  >> $NEWCONFIG
+                    echo "  <geoipdb>$INSTALLDIR/etc/GeoLiteCity.dat</geoipdb>"  >> $NEWCONFIG
                     echo "  </global>" >> $NEWCONFIG
                 fi
             fi
@@ -1212,7 +1212,7 @@ main()
                         echo "" >> $INSTALLDIR/etc/ossec.conf
                         echo "<ossec_config>" >> $INSTALLDIR/etc/ossec.conf
                         echo "<global>" >> $INSTALLDIR/etc/ossec.conf
-                        echo "  <geoipdb>/var/ossec/etc/GeoLiteCity.dat</geoipdb>"  >> $INSTALLDIR/etc/ossec.conf
+                        echo "  <geoipdb>$INSTALLDIR/etc/GeoLiteCity.dat</geoipdb>"  >> $INSTALLDIR/etc/ossec.conf
                         echo "  </global>" >> $INSTALLDIR/etc/ossec.conf
                         echo "</ossec_config>" >> $INSTALLDIR/etc/ossec.conf
                         echo "" >> $INSTALLDIR/etc/ossec.conf

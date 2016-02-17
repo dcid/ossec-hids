@@ -137,7 +137,9 @@ elif [ "X${ARGV}" = "Xlibs" ]; then
     DOZLIB="x"
     DOGEOIP="x"
 elif [ "X${ARGV}" = "Xrootcheck" ]; then
-    DIRECTORIES="os_xml os_regex os_net ${SOURCES} ${ROOTCHECKBIN}"    
+    DOZLIB="x"
+    DOGEOIP="x"
+    DIRECTORIES="os_xml os_regex os_net os_crypto ${SOURCES} monitord analysisd ${ROOTCHECKBIN}"    
 elif [ "X${ARGV}" = "Xbuild" ]; then
     DIRECTORIES="${BINARIES}"   # Only binaries need to be built
 else
@@ -236,8 +238,11 @@ if [ "X${ARGV}" = "Xrootcheck" ]; then
     cp -pr ./rootcheck/db ../
     cp -pr ./rootcheck/rootcheck.conf ../
     echo ""
+    echo ""
+    echo ""
+    echo ""
+    echo ""
     echo "Rootcheck compilation completed."
-    echo "Just run './ossec-rootcheck' to execute it."
     echo ""
 fi    
 

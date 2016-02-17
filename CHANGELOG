@@ -8,6 +8,10 @@ internal use, but it is open for anyone to get as well.
 
 Changes at the dev version
    * Feature: Added a default temp (shared) password for os_authd
+   * Feature: Added detection of outdated CMSs on rootcheck: WordPress,
+     Joomla & Drupal.
+   * Feature: Added signatures to detect Darkleech, Cdorked and some common
+     web backdoors.
 
 Changes with 2016-02
    * Feature: Added different_geoip and different_srcip rule types.

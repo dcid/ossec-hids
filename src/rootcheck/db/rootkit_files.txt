@@ -462,6 +462,7 @@ usr/bin/kfl                 ! Suspicious file ::rootkits/Suspicious.php
 tmp/.dump                   ! Suspicious file ::rootkits/Suspicious.php
 var/.x                      ! Suspicious file ::rootkits/Suspicious.php
 var/.x/psotnic              ! Suspicious file ::rootkits/Suspicious.php
+dev/shm/.ssh/known          ! Suspicious file ::rootkits/Suspicious.php
 */.log                      ! Suspicious file ::rootkits/Suspicious.php
 */ecmf                      ! Suspicious file ::rootkits/Suspicious.php
 */mirkforce                 ! Suspicious file ::rootkits/Suspicious.php

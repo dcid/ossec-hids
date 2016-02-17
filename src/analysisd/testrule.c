@@ -74,9 +74,6 @@ int AddHash_Rule(RuleNode *node);
 int OS_CleanMSG(char *msg, Eventinfo *lf);
 
 
-/* for FTS */
-int FTS_Init();
-int FTS(Eventinfo *lf);
 int AddtoIGnore(Eventinfo *lf);
 int IGnore(Eventinfo *lf);
 
@@ -205,6 +202,21 @@ int main(int argc, char **argv)
 
     if(chdir(dir) != 0)
         ErrorExit(CHROOT_ERROR,ARGV0,dir);
+
+
+    /* Opening GeoIP DB */
+    geoipdb = NULL;
+    if(Config.geoipdb_file)
+    {
+        geoipdb = GeoIP_open(Config.geoipdb_file, GEOIP_INDEX_CACHE);
+    }
+
+    /* Rootcheck audit. */
+    if(!geoipdb)
+    {
+        /* This is specific for rootcheck - when running it locally. */
+        geoipdb = GeoIP_open("etc/GeoLiteCity.dat", GEOIP_INDEX_CACHE);
+    }
 
 
     /*
@@ -402,13 +414,6 @@ void OS_ReadMSG(int m_queue, char *ut_str)
     /* Creating the event list */
     OS_CreateEventList(Config.memorysize);
 
-
-    /* Initiating the FTS list */
-    if(!FTS_Init())
-    {
-        ErrorExit(FTS_LIST_ERROR, ARGV0);
-    }
-                                
 
     __crt_ftell = 1;
 
