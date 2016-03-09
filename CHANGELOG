@@ -12,6 +12,9 @@ Changes at the dev version
      Joomla & Drupal.
    * Feature: Added signatures to detect Darkleech, Cdorked and some common
      web backdoors.
+   * Bug fix: Glob() implementation on logcollector. Was very very slow if
+     you have a few hundred entries.
+     
 
 Changes with 2016-02
    * Feature: Added different_geoip and different_srcip rule types.
@@ -24,7 +27,7 @@ Changes with 2016-02
      You can now specify hourly, or daily or any number of seconds.
    * Feature: Added libgeoip from MaxMind by default and changed 
      installation script to auto download the latest DB from them.
-   * Bug fixed: Multiple signatures cleanup and more sane defaults chosen.
+   * Bug fix: Multiple signatures cleanup and more sane defaults chosen.
    * Deprecated: if_matched_regex as it was barely used and very slow.
 
 Changes with 2015-12
