@@ -10,6 +10,7 @@ Changes at the dev version
    * Feature: Added a default temp (shared) password for os_authd
    * Feature: Added detection of outdated CMSs on rootcheck: WordPress,
      Joomla & Drupal.
+   * Feature: Added geoip change alerts by default on SSHD/WordPress rules.
    * Feature: Added signatures to detect Darkleech, Cdorked and some common
      web backdoors.
    * Bug fix: Glob() implementation on logcollector. Was very very slow if

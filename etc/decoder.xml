@@ -1526,8 +1526,8 @@
   -->
 <decoder name="wordpressaudit">
   <prematch>^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d WordPressAudit </prematch>
-  <regex offset="after_prematch">^\S+ \S+ : (\w+): (\S+); </regex>
-  <order>action, srcip</order>
+  <regex offset="after_prematch">^\S+ (\S+) : (\w+): (\S+); </regex>
+  <order>user,action, srcip</order>
 </decoder>
 
 
