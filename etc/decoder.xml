@@ -1526,9 +1526,24 @@
   -->
 <decoder name="wordpressaudit">
   <prematch>^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d WordPressAudit </prematch>
-  <regex offset="after_prematch">^\S+ (\S+) : (\w+): (\S+); </regex>
-  <order>user,action, srcip</order>
+  <regex offset="after_prematch">^\S+ \S+ : (\w+): (\S+); </regex>
+  <order>action, srcip</order>
 </decoder>
+
+<decoder name="wordpressaudit-login">
+  <parent>wordpressaudit</parent>
+  <prematch offset="after_parent">^\S+ \S+ : \w+: \S+; User authentication succeeded:</prematch>
+  <regex offset="after_parent">^\S+ \S+ : (\w+): (\S+); User authentication succeeded: (\w+)$</regex>
+  <order>action, srcip, user</order>
+</decoder>
+
+<decoder name="wordpressaudit-generic">
+  <parent>wordpressaudit</parent>
+  <prematch offset="after_parent">^\S+ \S+ : \w+: \S+;</prematch>
+  <regex offset="after_parent">^\S+ \S+ : (\w+): (\S+); </regex>
+  <order>action, srcip</order>
+</decoder>
+
 
 
 
