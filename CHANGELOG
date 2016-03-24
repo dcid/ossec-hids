@@ -15,6 +15,7 @@ Changes at the dev version
      web backdoors.
    * Bug fix: Glob() implementation on logcollector. Was very very slow if
      you have a few hundred entries.
+   * Bug fix: rootcheck sigs causing false positives on cpanel servers.
      
 
 Changes with 2016-02
