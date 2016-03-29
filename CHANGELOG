@@ -13,6 +13,10 @@ Changes at the dev version
    * Feature: Added geoip change alerts by default on SSHD/WordPress rules.
    * Feature: Added signatures to detect Darkleech, Cdorked and some common
      web backdoors.
+   * Feature: Added option to negate a pattern when using the OSMatch
+     library. Usage of ! at the beginning of the pattern will change the
+     behavior to return true when not found. Useful when writing subrules
+     when something is not present on the log.
    * Bug fix: Glob() implementation on logcollector. Was very very slow if
      you have a few hundred entries.
    * Bug fix: rootcheck sigs causing false positives on cpanel servers.
