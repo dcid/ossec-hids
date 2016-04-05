@@ -42,7 +42,13 @@ void *AR_Forward(void *arg)
     /* Creating the unix queue */
     if((arq = StartMQ(ARQUEUE, READ)) < 0)
     {
-        ErrorExit(QUEUE_ERROR, ARGV0, ARQUEUE, strerror(errno));
+        /* Retry after 2 seconds before exiting. */
+        merror(QUEUE_ERROR, ARGV0, ARQUEUE, strerror(errno));
+        sleep(2);
+        if((arq = StartMQ(ARQUEUE, READ)) < 0)
+        {
+            ErrorExit(QUEUE_ERROR, ARGV0, ARQUEUE, strerror(errno));
+        }
     }
 
     memset(msg, '\0', OS_SIZE_1024 +1);

@@ -1,4 +1,4 @@
-OSSEC v2016-02
+OSSEC v2016-04
 
 
 = Recommended Installation =
@@ -16,7 +16,7 @@ To get started:
    # wget https://bitbucket.org/dcid/ossec-hids/get/tip.tar.gz
 
 2- Install gcc and make. It comes by default on all BSD's and can be
-   easily installed by running "apt-get install gcc make" on Debian/Ubuntu
+   easily installed by running "apt-get install gcc make" on Ubuntu/Debian
    or "yum install gcc make" on CentOS/RedHat.
 
 3- Run the script ./install.sh. It will guide you through the 

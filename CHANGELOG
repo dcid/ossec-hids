@@ -5,8 +5,10 @@ for Sucuri's internal use.
 Every few months we create a stable release with these changes mostly for
 internal use, but it is open for anyone to get as well.
 
+More details: https://dcid.me/ossec
 
-Changes at the dev version
+
+Changes with 2016-04
    * Feature: Added a default temp (shared) password for os_authd
    * Feature: Added detection of outdated CMSs on rootcheck: WordPress,
      Joomla & Drupal.
@@ -19,7 +21,8 @@ Changes at the dev version
      when something is not present on the log.
    * Bug fix: Glob() implementation on logcollector. Was very very slow if
      you have a few hundred entries.
-   * Bug fix: rootcheck sigs causing false positives on cpanel servers.
+   * Bug fix: Rootcheck sigs causing false positives on cpanel servers.
+   * Bug fix: Finding right OpenSSL path on Debian.
      
 
 Changes with 2016-02

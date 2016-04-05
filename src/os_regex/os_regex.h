@@ -39,6 +39,7 @@
 /* OSRegex structure */
 typedef struct _OSRegex
 {
+    short int negate;
     int error;
     int *flags;
     char **patterns;
