@@ -14,5 +14,7 @@ If you have not used OSSEC before, I recommend reading this guide to get started
 
 http://dcid.me/texts/my-ossec-setup-manual.html
 
+More details here:
 
+http://dcid.me/ossec
 

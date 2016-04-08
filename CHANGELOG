@@ -14,7 +14,7 @@ Changes with 2016-04
      Joomla & Drupal.
    * Feature: Added geoip change alerts by default on SSHD/WordPress rules.
    * Feature: Added signatures to detect Darkleech, Cdorked and some common
-     web backdoors.
+     web backdoors and linux malware.
    * Feature: Added option to negate a pattern when using the OSMatch
      library. Usage of ! at the beginning of the pattern will change the
      behavior to return true when not found. Useful when writing subrules
