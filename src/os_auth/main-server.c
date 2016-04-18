@@ -288,7 +288,7 @@ int main(int argc, char **argv)
                 if(authpass)
                 {
                     /* Format is pretty simple: OSSEC PASS: PASS WHATEVERACTION */
-                    if(strncmp(tmpstr, "OSSEC PASS:", 12) == 0)
+                    if(strncmp(tmpstr, "OSSEC PASS:", 11) == 0)
                     {
                         tmpstr = tmpstr + 12;
                         if(strlen(tmpstr) > strlen(authpass) && strncmp(tmpstr, authpass, strlen(authpass)) == 0)
