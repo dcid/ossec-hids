@@ -70,6 +70,10 @@ void FreeAlertData(alert_data *al_data)
     {
         free(al_data->dstip);
     }
+    if(al_data->alertid)
+    {
+        free(al_data->alertid);
+    }
     if(al_data->user)
     {
         free(al_data->user);
@@ -80,11 +84,13 @@ void FreeAlertData(alert_data *al_data)
     }
     if(al_data->log)
     {
+        char **log2free = al_data->log;
         while(*(al_data->log))
         {
             free(*(al_data->log));
             al_data->log++;
         }
+        free(log2free);
     }
     free(al_data);
     al_data = NULL;
@@ -277,6 +283,10 @@ alert_data *GetAlertData(int flag, FILE *fp)
                     goto l_error;
                 
                 p++;
+                if(comment)
+                {
+                    free(comment);
+                }
                 os_strdup(p, comment);
                 
                 /* Must have the closing \' */
@@ -297,6 +307,7 @@ alert_data *GetAlertData(int flag, FILE *fp)
                 os_clearnl(str,p);
                 
                 p = str + SRCIP_BEGIN_SZ;
+                if(srcip){ free(srcip); }
                 os_strdup(p, srcip);
             }
             /* srcport */
@@ -313,6 +324,7 @@ alert_data *GetAlertData(int flag, FILE *fp)
                 os_clearnl(str,p);
                 
                 p = str + DSTIP_BEGIN_SZ;
+                if(dstip){ free(dstip); }
                 os_strdup(p, dstip);
             }
             /* dstport */
@@ -329,6 +341,7 @@ alert_data *GetAlertData(int flag, FILE *fp)
                 os_clearnl(str,p);
                 
                 p = str + USER_BEGIN_SZ;
+                if(user) { free(user); }
                 os_strdup(p, user);
             }
             /* It is a log message */
@@ -340,6 +353,7 @@ alert_data *GetAlertData(int flag, FILE *fp)
                 {
                     if(strncmp(str, "Integrity checksum changed for: '",33) == 0)
                     {
+                        if(filename) { free(filename); }
                         filename = strdup(str+33);
                         if(filename)
                         {
@@ -366,6 +380,11 @@ alert_data *GetAlertData(int flag, FILE *fp)
             free(date);
             date = NULL;
         }
+        if(alertid)
+        {
+            free(alertid);
+            alertid = NULL;
+        }
         if(location)
         {
             free(location);
@@ -380,6 +399,11 @@ alert_data *GetAlertData(int flag, FILE *fp)
         {
             free(srcip);
             srcip = NULL;
+        }
+        if(dstip)
+        {
+            free(dstip);
+            dstip = NULL;
         }
         if(user)
         {
@@ -404,6 +428,11 @@ alert_data *GetAlertData(int flag, FILE *fp)
                 free(log[log_size]);
                 log[log_size] = NULL;
             }
+        }
+        if(log)
+        {
+            free(log);
+            log = NULL;
         }
     }
 

@@ -91,6 +91,19 @@ void OS_IntegratorD(IntegratorConfig **integrator_config)
             }
         }
 
+        else if(strcmp(integrator_config[s]->name, "logentries") == 0)
+        {
+            if(!integrator_config[s]->hookurl)
+            {
+                integrator_config[s]->enabled = 0;
+                merror("%s: ERROR: Unable to enable integration for: '%s'. Missing hookurl URL.",
+                   ARGV0, integrator_config[s]->name);
+                s++;
+                continue;
+            }
+        }
+
+
         else if(strncmp(integrator_config[s]->name, "custom-", 7) == 0)
         {
         }
@@ -251,12 +264,12 @@ void OS_IntegratorD(IntegratorConfig **integrator_config)
                         log_count++;
                         tmpstr++;
 
-                        if(log_count >= 165)
+                        if(log_count >= 465)
                         {
-                            *tmpstr='\0'; 
-                            *(tmpstr -1)='.'; 
-                            *(tmpstr -2)='.'; 
-                            *(tmpstr -3)='.'; 
+                            *tmpstr = '\0'; 
+                            *(tmpstr -1) = '.'; 
+                            *(tmpstr -2) = '.'; 
+                            *(tmpstr -3) = '.'; 
                             break;
                         }
                     } 

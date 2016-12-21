@@ -10,6 +10,9 @@ More details: https://dcid.me/ossec
 
 Changes on Development branch
    * Bug fix: Missing option on agent-auth help message and authentication.
+   * Feature: Logentries integration.
+   * Bug fix: Memory leak on read-alert (affecting maild, client-syslog and 
+     integratord).
 
 
 Changes with 2016-04
